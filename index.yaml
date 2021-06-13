@@ -1,0 +1,187 @@
+openapi: 3.0.0
+info:
+  title: todo
+  description: todo application
+  version: 0.0.0
+servers:
+  - url: http://127.0.0.1:8080
+tags:
+  - name: health
+    description: テスト
+  - name: tasks
+    description: タスク
+
+paths:
+  /health:
+    get:
+      tags:
+        - health
+      operationId: getHealth
+      summary: サーバーの状態を返します
+      description: サーバーの状態を返します。
+      responses:
+        200:
+          $ref: "#/components/responses/getHealthResponse"
+
+  /tasks:
+    get:
+      tags:
+        - tasks
+      operationId: getTasks
+      summary: タスク一覧
+      responses:
+        200:
+          $ref: "#/components/responses/getTasksResponse"
+
+    post:
+      tags:
+        - tasks
+      operationId: postTasks
+      summary: タスク作成
+      requestBody:
+        $ref: "#/components/requestBodies/postTasksParams"
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+
+  /task/{id}:
+    get:
+      tags:
+        - tasks
+      operationId: getTask
+      summary: タスク詳細
+      parameters:
+        - $ref: "#/components/parameters/getTaskParams"
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+
+    put:
+      tags:
+        - tasks
+      operationId: putTask
+      summary: タスク更新
+      parameters:
+        - $ref: "#/components/parameters/getTaskParams"
+      requestBody:
+        $ref: "#/components/requestBodies/putTasksParams"
+      responses:
+        200:
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+
+    delete:
+      tags:
+        - tasks
+      operationId: deleteTask
+      summary: タスク削除
+      parameters:
+        - $ref: "#/components/parameters/getTaskParams"
+      responses:
+        200:
+          description: 成功
+
+components:
+  schemas:
+    task:
+      description: タスク
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: タスク名
+        content:
+          type: string
+          example: タスク内容
+        isDone:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          example: "2020-01-31T23:59:59+09:00"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2020-01-31T23:59:59+09:00"
+
+  parameters:
+    getTaskParams:
+      in: path
+      description: タスクID
+      name: id
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+
+  requestBodies:
+    postTasksParams:
+      description: タスク作成のパラメータ
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: タスク名
+              content:
+                type: string
+                example: タスク内容
+
+    putTasksParams:
+      description: タスク更新のパラメータ
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: タスク名
+              content:
+                type: string
+                example: タスク内容
+
+  responses:
+    getHealthResponse:
+      description: サーバーの状態のレスポンス
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum:
+                  - ok
+            required:
+              - status
+
+    getTasksResponse:
+      description: タスク一覧のレスポンス
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tasks:
+                type: array
+                items:
+                  $ref: "#/components/schemas/task"
